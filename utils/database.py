@@ -4,13 +4,13 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
-# Dynamically resolve the folder where database.py lives
+# 1. Generate an absolute path to complaints.db at runtime
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# Put complaints.db one folder up, right in the root repository folder
-DB_PATH = os.path.join(BASE_DIR, "..", "complaints.db")
+DB_PATH = os.path.normpath(os.path.join(BASE_DIR, "..", "complaints.db"))
 
 Base = declarative_base()
-engine = create_engine(f'sqlite:///{os.path.abspath(DB_PATH)}', connect_args={"check_same_thread": False})
+# Uses 3 slashes followed by the absolute dynamic path string
+engine = create_engine(f'sqlite:///{DB_PATH}', connect_args={"check_same_thread": False})
 Session = sessionmaker(bind=engine)
 
 class User(Base):
@@ -43,7 +43,7 @@ def init_db():
             role='admin'
         )
         session.add(admin)
-        # Add sample complaints - sentiment computed live via TextBlob (utils/predict.py)
+        
         from utils.predict import predict_sentiment
         sample_texts = [
             'Vodacom failed to process my payment twice and I lost money',
@@ -103,8 +103,8 @@ def get_all_complaints():
     session = Session()
     complaints = session.query(Complaint).all()
     data = [{'id': c.id, 'text': c.text, 'sentiment': c.sentiment,
-              'confidence': c.confidence, 'source': c.source,
-              'user_id': c.user_id, 'created_at': c.created_at} for c in complaints]
+             'confidence': c.confidence, 'source': c.source,
+             'user_id': c.user_id, 'created_at': c.created_at} for c in complaints]
     session.close()
     return data
 
@@ -112,7 +112,7 @@ def get_user_complaints(user_id):
     session = Session()
     complaints = session.query(Complaint).filter_by(user_id=user_id).all()
     data = [{'id': c.id, 'text': c.text, 'sentiment': c.sentiment,
-              'confidence': c.confidence, 'source': c.source,
-              'created_at': c.created_at} for c in complaints]
+             'confidence': c.confidence, 'source': c.source,
+             'created_at': c.created_at} for c in complaints]
     session.close()
     return data
