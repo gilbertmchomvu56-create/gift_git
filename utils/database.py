@@ -1,10 +1,16 @@
+import os
 from sqlalchemy import create_engine, Column, Integer, String, Float, Text, DateTime
 from sqlalchemy.orm import declarative_base, sessionmaker
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
+# Dynamically resolve the folder where database.py lives
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Put complaints.db one folder up, right in the root repository folder
+DB_PATH = os.path.join(BASE_DIR, "..", "complaints.db")
+
 Base = declarative_base()
-engine = create_engine('sqlite:///complaints.db', connect_args={"check_same_thread": False})
+engine = create_engine(f'sqlite:///{os.path.abspath(DB_PATH)}', connect_args={"check_same_thread": False})
 Session = sessionmaker(bind=engine)
 
 class User(Base):
