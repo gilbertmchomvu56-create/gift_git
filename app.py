@@ -1,6 +1,4 @@
 import streamlit as st
-import sys
-sys.path.insert(0, '/home/claude/complaintsense')
 
 from utils.database import init_db, login_user, register_user
 from pages import admin, company, customer
