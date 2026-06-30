@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
 Base = declarative_base()
-engine = create_engine('sqlite:////home/claude/complaintsense/complaints.db', connect_args={"check_same_thread": False})
+engine = create_engine('sqlite:///complaints.db', connect_args={"check_same_thread": False})
 Session = sessionmaker(bind=engine)
 
 class User(Base):
